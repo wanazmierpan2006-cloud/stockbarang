@@ -241,27 +241,27 @@
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             
             <!-- Top Navbar (Pure White) -->
-            <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 shadow-sm z-30 transition-colors">
-                <div class="flex items-center space-x-3">
-                    <button @click="sidebarOpen = true" class="lg:hidden text-slate-600 dark:text-slate-300 hover:text-slate-900 focus:outline-none p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+            <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-3 sm:px-6 shadow-sm z-30 transition-colors">
+                <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1 mr-2">
+                    <button @click="sidebarOpen = true" class="lg:hidden text-slate-600 dark:text-slate-300 hover:text-slate-900 focus:outline-none p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0">
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">@yield('title', 'Dashboard')</h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">PT STH Network Inventory Management System</p>
+                    <div class="min-w-0">
+                        <h2 class="text-sm sm:text-lg font-extrabold text-slate-900 dark:text-white leading-tight truncate">@yield('title', 'Dashboard')</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block truncate">PT STH Network Inventory Management System</p>
                     </div>
                 </div>
 
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
                     <!-- Instagram Link Button -->
                     <a href="https://www.instagram.com/sthnetwork.id?igsh=MWJvcjQ4ejVxbTNscQ%3D%3D" target="_blank" 
                        class="p-2 rounded-xl text-[#ff8000] hover:bg-orange-50 dark:hover:bg-slate-800 transition-colors flex items-center space-x-1.5 text-xs font-bold"
                        title="Instagram PT STH Network">
                         <i class="fa-brands fa-instagram text-lg"></i>
-                        <span class="hidden sm:inline">@sthnetwork.id</span>
+                        <span class="hidden md:inline">@sthnetwork.id</span>
                     </a>
 
-                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+                    <div class="h-5 w-px bg-slate-200 dark:bg-slate-800"></div>
 
                     <!-- Dark Mode Toggle Button -->
                     <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)" 

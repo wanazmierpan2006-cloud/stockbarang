@@ -6,23 +6,23 @@
 <div class="max-w-5xl mx-auto space-y-6" x-data="universalPosScanner()">
 
     <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-extrabold border mb-2 transition-all"
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="min-w-0">
+            <div class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold border mb-1.5 transition-all max-w-full"
                  :class="transactionType === 'incoming' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 border-rose-500/20'">
-                <i class="fa-solid fa-barcode"></i>
-                <span x-text="transactionType === 'incoming' ? 'POS SCANNER - BARANG MASUK' : 'POS SCANNER - BARANG KELUAR'"></span>
+                <i class="fa-solid fa-barcode shrink-0"></i>
+                <span class="truncate" x-text="transactionType === 'incoming' ? 'POS - BARANG MASUK' : 'POS - BARANG KELUAR'"></span>
             </div>
-            <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">Universal POS Barcode Scanner</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Scan multi-barang sekaligus untuk transaksi Barang Masuk maupun Barang Keluar dalam 1 halaman.</p>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Universal POS Barcode Scanner</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">Scan multi-barang sekaligus untuk transaksi Barang Masuk & Keluar.</p>
         </div>
 
-        <div class="flex items-center space-x-2">
-            <a href="{{ route('incoming.index') }}" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-2xl text-xs font-bold transition flex items-center space-x-1.5">
+        <div class="flex items-center gap-2 shrink-0">
+            <a href="{{ route('incoming.index') }}" class="flex-1 sm:flex-initial px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-download text-emerald-500"></i>
                 <span>Riwayat Masuk</span>
             </a>
-            <a href="{{ route('outgoing.index') }}" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-2xl text-xs font-bold transition flex items-center space-x-1.5">
+            <a href="{{ route('outgoing.index') }}" class="flex-1 sm:flex-initial px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-arrow-up-from-bracket text-rose-500"></i>
                 <span>Riwayat Keluar</span>
             </a>
@@ -30,32 +30,32 @@
     </div>
 
     <!-- Main POS Card -->
-    <div class="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+    <div class="bg-white dark:bg-slate-900 p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-5 sm:space-y-6">
 
         <!-- Transaction Type Switcher Bar -->
-        <div class="p-2 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 px-2 flex items-center space-x-2">
-                <i class="fa-solid fa-[#ff8000] fa-sliders"></i>
-                <span>Pilih Jenis Transaksi:</span>
+        <div class="p-2 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+            <div class="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 px-1 flex items-center space-x-2">
+                <i class="fa-solid fa-sliders text-[#ff8000]"></i>
+                <span>Pilih Transaksi:</span>
             </div>
 
             <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
                 <button type="button" @click="transactionType = 'incoming'" 
                         :class="transactionType === 'incoming' 
-                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 font-black' 
+                            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 font-black' 
                             : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 font-bold'"
-                        class="px-6 py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-circle-down text-sm"></i>
-                    <span>🟢 Barang Masuk (Stok +)</span>
+                        class="px-3 sm:px-5 py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5 text-center">
+                    <i class="fa-solid fa-circle-down text-xs shrink-0"></i>
+                    <span>Masuk (Stok +)</span>
                 </button>
 
                 <button type="button" @click="transactionType = 'outgoing'" 
                         :class="transactionType === 'outgoing' 
-                            ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30 font-black' 
+                            ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 font-black' 
                             : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 font-bold'"
-                        class="px-6 py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-circle-up text-sm"></i>
-                    <span>🔴 Barang Keluar (Stok -)</span>
+                        class="px-3 sm:px-5 py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1.5 text-center">
+                    <i class="fa-solid fa-circle-up text-xs shrink-0"></i>
+                    <span>Keluar (Stok -)</span>
                 </button>
             </div>
         </div>
@@ -109,47 +109,65 @@
             </div>
 
             <!-- Section 2: Barcode Scanner Input Box & Status Indicator -->
-            <div class="py-2 space-y-3">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <label for="barcode_input" class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center space-x-2">
-                        <i class="fa-solid fa-barcode text-lg" :class="transactionType === 'incoming' ? 'text-emerald-500' : 'text-rose-500'"></i>
-                        <span>Scan Barcode Barang (Auto-Focus & Multi Scan)</span>
+            <div class="py-1 sm:py-2 space-y-2.5">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <label for="barcode_input" class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-barcode text-base" :class="transactionType === 'incoming' ? 'text-emerald-500' : 'text-rose-500'"></i>
+                        <span>Scan / Input Barcode</span>
                     </label>
 
                     <!-- Status Indicator Pill -->
-                    <div class="flex items-center space-x-2 text-xs font-bold px-3 py-1.5 rounded-full"
+                    <div class="text-[11px] font-bold px-2.5 py-1 rounded-full w-full sm:w-auto text-center sm:text-left"
                          :class="{
                              'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20': statusState === 'active',
                              'bg-amber-500/10 text-amber-600 border border-amber-500/20': statusState === 'duplicate',
                              'bg-rose-500/10 text-rose-600 border border-rose-500/20': statusState === 'not_found' || statusState === 'stock_error'
                          }">
-                        <span x-show="statusState === 'active'"><i class="fa-solid fa-circle text-[10px] mr-1 text-emerald-500 animate-pulse"></i> 🟢 Scanner Aktif — Siap Scan</span>
-                        <span x-show="statusState === 'duplicate'"><i class="fa-solid fa-circle text-[10px] mr-1 text-amber-500"></i> 🟡 Duplikat Scan — Qty Bertambah (+1)</span>
-                        <span x-show="statusState === 'not_found'"><i class="fa-solid fa-circle text-[10px] mr-1 text-rose-500"></i> 🔴 Barcode Belum Terdaftar</span>
-                        <span x-show="statusState === 'stock_error'"><i class="fa-solid fa-circle text-[10px] mr-1 text-rose-500"></i> 🔴 Stok Tidak Mencukupi</span>
+                        <span x-show="statusState === 'active'"><i class="fa-solid fa-circle text-[8px] mr-1 text-emerald-500 animate-pulse"></i> Scanner Siap</span>
+                        <span x-show="statusState === 'duplicate'"><i class="fa-solid fa-circle text-[8px] mr-1 text-amber-500"></i> Duplikat: Qty (+1)</span>
+                        <span x-show="statusState === 'not_found'"><i class="fa-solid fa-circle text-[8px] mr-1 text-rose-500"></i> Belum Terdaftar</span>
+                        <span x-show="statusState === 'stock_error'"><i class="fa-solid fa-circle text-[8px] mr-1 text-rose-500"></i> Stok Kurang</span>
                     </div>
                 </div>
 
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-barcode text-xl"></i>
+                <div class="space-y-2">
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 sm:pl-4 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-barcode text-lg sm:text-xl"></i>
+                        </div>
+                        <input type="text" x-ref="barcodeInput" x-model="barcodeQuery" @keydown.enter.prevent="handleScan()" 
+                               placeholder="Arahkan barcode scanner / ketik kode..." 
+                               class="w-full pl-10 sm:pl-12 pr-4 sm:pr-48 py-3 sm:py-3.5 bg-slate-50 dark:bg-slate-800 border-2 rounded-2xl text-sm sm:text-base font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 transition-all"
+                               :class="transactionType === 'incoming' ? 'border-emerald-500/40 focus:border-emerald-500 focus:ring-emerald-500/10' : 'border-rose-500/40 focus:border-rose-500 focus:ring-rose-500/10'">
+                        
+                        <!-- Desktop action buttons inside input -->
+                        <div class="hidden sm:flex absolute right-2 top-2 bottom-2 items-center space-x-1.5">
+                            <button type="button" @click="openCameraScanner()" 
+                                    class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
+                                <i class="fa-solid fa-camera"></i>
+                                <span>Kamera</span>
+                            </button>
+                            <button type="button" @click="handleScan()" 
+                                    :class="transactionType === 'incoming' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'"
+                                    class="px-4 py-2 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <span>Scan</span>
+                            </button>
+                        </div>
                     </div>
-                    <input type="text" x-ref="barcodeInput" x-model="barcodeQuery" @keydown.enter.prevent="handleScan()" 
-                           placeholder="Arahkan barcode scanner di sini atau ketik kode/barcode lalu tekan Enter..." 
-                           class="w-full pl-12 pr-48 py-4 bg-slate-50 dark:bg-slate-800 border-2 rounded-2xl text-base font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 transition-all"
-                           :class="transactionType === 'incoming' ? 'border-emerald-500/40 focus:border-emerald-500 focus:ring-emerald-500/10' : 'border-rose-500/40 focus:border-rose-500 focus:ring-rose-500/10'">
-                    
-                    <div class="absolute right-2 top-2 bottom-2 flex items-center space-x-1.5">
+
+                    <!-- Mobile action buttons below input -->
+                    <div class="grid grid-cols-2 gap-2 sm:hidden">
                         <button type="button" @click="openCameraScanner()" 
-                                class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
+                                class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1.5">
                             <i class="fa-solid fa-camera"></i>
-                            <span>Kamera</span>
+                            <span>Scan Kamera</span>
                         </button>
                         <button type="button" @click="handleScan()" 
                                 :class="transactionType === 'incoming' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'"
-                                class="px-4 py-2 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
+                                class="w-full py-2.5 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1.5">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <span>Scan</span>
+                            <span>Cari / Scan</span>
                         </button>
                     </div>
                 </div>
