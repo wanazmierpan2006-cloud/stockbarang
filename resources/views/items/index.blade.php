@@ -1,0 +1,137 @@
+@extends('layouts.app')
+
+@section('title', 'Data Barang Inventaris')
+
+@section('content')
+<div class="space-y-6" x-data="{ search: '', categoryFilter: '', stockFilter: '' }">
+
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Data Barang Inventaris</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Daftar seluruh barang, jumlah stok saat ini, minimum stok, dan supplier.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <a href="{{ route('items.print-barcodes') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 rounded-2xl text-xs font-bold transition">
+                <i class="fa-solid fa-print mr-2"></i>
+                <span>Cetak Barcode Massal</span>
+            </a>
+            @if(auth()->user()->isAdmin())
+            <a href="{{ route('items.create') }}" class="inline-flex items-center px-5 py-2.5 bg-[#ff8000] hover:bg-[#e67300] text-white rounded-2xl text-xs font-extrabold shadow-lg shadow-[#ff8000]/30 transition">
+                <i class="fa-solid fa-plus mr-2"></i>
+                <span>+ Tambah Barang Baru</span>
+            </a>
+            @endif
+        </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
+        
+        <!-- Search Input -->
+        <div class="relative w-full md:w-80">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+            </div>
+            <input type="text" x-model="search" placeholder="Cari kode atau nama barang..." 
+                   class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500">
+        </div>
+
+        <div class="flex items-center space-x-3 w-full md:w-auto">
+            <!-- Filter Stok -->
+            <select x-model="stockFilter" class="w-full md:w-44 py-2 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500">
+                <option value="">Semua Stok</option>
+                <option value="low">Stok Hampir Habis</option>
+                <option value="normal">Stok Aman</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                        <th class="px-6 py-4">Kode</th>
+                        <th class="px-6 py-4">Nama Barang</th>
+                        <th class="px-6 py-4">Kategori</th>
+                        <th class="px-6 py-4">Supplier</th>
+                        <th class="px-6 py-4 text-center">Stok Sisa</th>
+                        <th class="px-6 py-4 text-center">Min. Stok</th>
+                        <th class="px-6 py-4 text-center">Status Stok</th>
+                        <th class="px-6 py-4 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300">
+                    @forelse($items as $item)
+                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition"
+                        x-show="(search === '' || '{{ strtolower($item->kode_barang) }}'.includes(search.toLowerCase()) || '{{ strtolower($item->nama_barang) }}'.includes(search.toLowerCase())) && (stockFilter === '' || (stockFilter === 'low' && {{ $item->stok <= $item->minimum_stok ? 'true' : 'false' }}) || (stockFilter === 'normal' && {{ $item->stok > $item->minimum_stok ? 'true' : 'false' }}))">
+                        <td class="px-6 py-4 font-mono font-bold text-cyan-600 dark:text-cyan-400">{{ $item->kode_barang }}</td>
+                        <td class="px-6 py-4 font-bold text-slate-800 dark:text-white">
+                            {{ $item->nama_barang }}
+                            @if($item->keterangan)
+                            <p class="text-[10px] text-slate-400 font-normal truncate max-w-xs">{{ $item->keterangan }}</p>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4">{{ $item->category->nama ?? '-' }}</td>
+                        <td class="px-6 py-4 text-slate-500 dark:text-slate-400">{{ $item->supplier->nama ?? '-' }}</td>
+                        <td class="px-6 py-4 text-center font-extrabold text-sm">
+                            <span class="{{ $item->isLowStock() ? 'text-rose-600 dark:text-rose-400' : 'text-slate-800 dark:text-white' }}">
+                                {{ number_format($item->stok) }}
+                            </span>
+                            <span class="text-[10px] font-normal text-slate-400 ml-1">{{ $item->satuan }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center font-semibold text-slate-500">{{ number_format($item->minimum_stok) }} {{ $item->satuan }}</td>
+                        <td class="px-6 py-4 text-center">
+                            @if($item->isLowStock())
+                            <span class="px-2.5 py-1 text-[10px] font-extrabold rounded-full bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 inline-flex items-center">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Hampir Habis
+                            </span>
+                            @else
+                            <span class="px-2.5 py-1 text-[10px] font-extrabold rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 inline-flex items-center">
+                                <i class="fa-solid fa-circle-check mr-1"></i> Normal
+                            </span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center space-x-2">
+                                <a href="{{ route('items.show', $item->id) }}" class="p-2 text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition" title="Detail Barang">
+                                    <i class="fa-solid fa-eye text-base"></i>
+                                </a>
+
+                                @if(auth()->user()->isAdmin())
+                                <a href="{{ route('items.edit', $item->id) }}" class="p-2 text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition" title="Edit Barang">
+                                    <i class="fa-solid fa-pen-to-square text-base"></i>
+                                </a>
+                                <form id="delete-item-{{ $item->id }}" action="{{ route('items.destroy', $item->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" onclick="confirmDelete('delete-item-{{ $item->id }}', 'Apakah Anda yakin ingin menghapus barang {{ $item->nama_barang }}?')" 
+                                            class="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition" title="Hapus Barang">
+                                        <i class="fa-solid fa-trash text-base"></i>
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8" class="px-6 py-12 text-center text-slate-400">
+                            <i class="fa-solid fa-box-open text-3xl mb-2 text-slate-300 dark:text-slate-600"></i>
+                            <p>Belum ada data barang terdaftar.</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if($items->hasPages())
+        <div class="px-6 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
+            {!! $items->onEachSide(1)->links() !!}
+        </div>
+        @endif
+    </div>
+</div>
+@endsection

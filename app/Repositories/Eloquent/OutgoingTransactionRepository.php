@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Repositories\Eloquent;
+
+use App\Models\OutgoingTransaction;
+use App\Models\OutgoingTransactionDetail;
+use App\Repositories\Contracts\OutgoingTransactionRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
+
+class OutgoingTransactionRepository implements OutgoingTransactionRepositoryInterface
+{
+    public function getAll(): Collection
+    {
+        return OutgoingTransaction::with(['user', 'details.item'])
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('id', 'desc')
+            ->get();
+    }
+
+    public function getPaginated(int $perPage = 15): LengthAwarePaginator
+    {
+        return OutgoingTransaction::with(['user', 'details.item'])
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
+    public function findById(int $id): ?OutgoingTransaction
+    {
+        return OutgoingTransaction::with(['user', 'details.item'])->find($id);
+    }
+
+    public function createHeader(array $data): OutgoingTransaction
+    {
+        return OutgoingTransaction::create($data);
+    }
+
+    public function createDetail(OutgoingTransaction $transaction, array $detailData)
+    {
+        return $transaction->details()->create($detailData);
+    }
+
+    public function delete(int $id): bool
+    {
+        $record = OutgoingTransaction::find($id);
+        if (! $record) {
+            return false;
+        }
+
+        return $record->delete();
+    }
+
+    public function getTodayCount(): int
+    {
+        return OutgoingTransactionDetail::whereHas('transaction', function ($q) {
+            $q->whereDate('tanggal', now()->format('Y-m-d'));
+        })->sum('jumlah');
+    }
+
+    public function getMonthlyStats(): array
+    {
+        $months = [];
+        $data = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $monthLabel = $date->translatedFormat('M Y');
+            $sum = OutgoingTransactionDetail::whereHas('transaction', function ($q) use ($date) {
+                $q->whereYear('tanggal', $date->year)->whereMonth('tanggal', $date->month);
+            })->sum('jumlah');
+            $months[] = $monthLabel;
+            $data[] = (int) $sum;
+        }
+
+        return ['labels' => $months, 'data' => $data];
+    }
+
+    public function getFiltered(?string $startDate, ?string $endDate, ?string $month, ?string $year): Collection
+    {
+        $query = OutgoingTransaction::with(['user', 'details.item.category']);
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('tanggal', [$startDate, $endDate]);
+        }
+
+        if ($month) {
+            $query->whereMonth('tanggal', $month);
+        }
+
+        if ($year) {
+            $query->whereYear('tanggal', $year);
+        }
+
+        return $query->orderBy('tanggal', 'desc')->get();
+    }
+}
