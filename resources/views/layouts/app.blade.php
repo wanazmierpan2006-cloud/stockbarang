@@ -289,7 +289,7 @@
                         </button>
 
                         <div x-cloak x-show="openNotification" @click.outside="openNotification = false" 
-                             class="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-3 z-50">
+                             class="fixed sm:absolute left-3 right-3 sm:left-auto sm:right-0 top-16 sm:top-full sm:mt-2 w-auto sm:w-80 max-w-[calc(100vw-1.5rem)] bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-3 z-50 transition-all">
                             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
                                 <span class="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider flex items-center space-x-1.5">
                                     <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
@@ -298,15 +298,15 @@
                                 <span class="px-2 py-0.5 text-[10px] font-extrabold bg-rose-500/10 text-rose-600 rounded-full">{{ $lowStockAlertCount }} Barang</span>
                             </div>
 
-                            <div class="space-y-2 max-h-64 overflow-y-auto">
+                            <div class="space-y-2 max-h-64 sm:max-h-72 overflow-y-auto pr-1">
                                 @forelse($lowStockAlerts as $alertItem)
-                                <a href="{{ route('items.show', $alertItem->id) }}" class="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl flex items-center justify-between hover:bg-orange-50 dark:hover:bg-slate-800 transition text-xs block">
-                                    <div>
-                                        <p class="font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{{ $alertItem->nama_barang }}</p>
+                                <a href="{{ route('items.show', $alertItem->id) }}" class="p-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl sm:rounded-2xl flex items-center justify-between hover:bg-orange-50 dark:hover:bg-slate-800 transition text-xs block group">
+                                    <div class="flex-1 min-w-0 mr-2">
+                                        <p class="font-bold text-slate-900 dark:text-white truncate group-hover:text-[#ff8000]">{{ $alertItem->nama_barang }}</p>
                                         <p class="text-[10px] text-slate-400 font-mono">{{ $alertItem->kode_barang }}</p>
                                     </div>
-                                    <div class="text-right">
-                                        <span class="px-2.5 py-1 text-[10px] font-extrabold rounded-full bg-rose-500/10 text-rose-600">
+                                    <div class="shrink-0 text-right">
+                                        <span class="px-2 py-1 text-[10px] font-extrabold rounded-full bg-rose-500/10 text-rose-600 whitespace-nowrap">
                                             Sisa: {{ $alertItem->stok }} {{ $alertItem->satuan }}
                                         </span>
                                     </div>
