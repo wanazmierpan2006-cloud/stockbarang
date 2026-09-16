@@ -52,7 +52,9 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => (filter_var(env('APP_URL'), FILTER_VALIDATE_URL) && parse_url(env('APP_URL'), PHP_URL_HOST))
+        ? env('APP_URL')
+        : 'http://localhost',
 
     /*
     |--------------------------------------------------------------------------
