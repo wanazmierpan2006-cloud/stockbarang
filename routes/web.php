@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\BackupController;
 use App\Http\Controllers\BarcodeScanController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
@@ -10,7 +9,6 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OutgoingItemController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -49,21 +47,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/export-excel', [ReportController::class, 'exportExcel'])->name('export-excel');
     });
 
-    // Admin & Gudang Routes (Barcode POS Cashier Scanner Transaksi & Stock Opname)
+    // Admin & Gudang Routes (Barcode POS Cashier Scanner Transaksi)
     Route::middleware('role:admin,gudang')->group(function () {
         Route::get('/pos/scan', [PosController::class, 'index'])->name('pos.scan');
         Route::post('/pos/store', [PosController::class, 'store'])->name('pos.store');
 
         Route::resource('incoming', IncomingItemController::class)->except(['edit', 'update']);
         Route::resource('outgoing', OutgoingItemController::class)->except(['edit', 'update']);
-        Route::resource('adjustments', StockAdjustmentController::class)->except(['edit', 'update', 'destroy']);
     });
 
     // Admin Only Routes (Manage Users, Suppliers, Categories, CRUD Items)
     Route::middleware('role:admin')->group(function () {
-        // Backup Database Download (Admin Only - berisi seluruh data termasuk hash password)
-        Route::get('/backup/download', [BackupController::class, 'download'])->name('backup.download');
-
         Route::resource('users', UserController::class)->except(['show']);
         Route::resource('suppliers', SupplierController::class)->except(['show']);
         Route::resource('categories', CategoryController::class)->except(['show']);

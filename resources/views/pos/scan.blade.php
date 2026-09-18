@@ -131,25 +131,34 @@
                 </div>
 
                 <div class="space-y-2">
+                    <!-- Hidden file input & reader for gallery scanner -->
+                    <input type="file" x-ref="galleryInput" @change="handleGalleryScan($event)" accept="image/*" class="hidden">
+                    <div id="gallery-qr-reader" style="width: 1px; height: 1px; position: absolute; left: -9999px; overflow: hidden;"></div>
+
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 pl-3.5 sm:pl-4 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-solid fa-barcode text-lg sm:text-xl"></i>
                         </div>
                         <input type="text" x-ref="barcodeInput" x-model="barcodeQuery" @keydown.enter.prevent="handleScan()" 
                                placeholder="Arahkan barcode scanner / ketik kode..." 
-                               class="w-full pl-10 sm:pl-12 pr-4 sm:pr-48 py-3 sm:py-3.5 bg-slate-50 dark:bg-slate-800 border-2 rounded-2xl text-sm sm:text-base font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 transition-all"
+                               class="w-full pl-10 sm:pl-12 pr-4 sm:pr-72 py-3 sm:py-3.5 bg-slate-50 dark:bg-slate-800 border-2 rounded-2xl text-sm sm:text-base font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 transition-all"
                                :class="transactionType === 'incoming' ? 'border-emerald-500/40 focus:border-emerald-500 focus:ring-emerald-500/10' : 'border-rose-500/40 focus:border-rose-500 focus:ring-rose-500/10'">
                         
                         <!-- Desktop action buttons inside input -->
                         <div class="hidden sm:flex absolute right-2 top-2 bottom-2 items-center space-x-1.5">
+                            <button type="button" @click="$refs.galleryInput.click()" 
+                                    class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
+                                <i class="fa-solid fa-image"></i>
+                                <span>Galeri</span>
+                            </button>
                             <button type="button" @click="openCameraScanner()" 
-                                    class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
+                                    class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
                                 <i class="fa-solid fa-camera"></i>
                                 <span>Kamera</span>
                             </button>
                             <button type="button" @click="handleScan()" 
                                     :class="transactionType === 'incoming' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'"
-                                    class="px-4 py-2 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
+                                    class="px-3.5 py-2 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                                 <span>Scan</span>
                             </button>
@@ -157,17 +166,22 @@
                     </div>
 
                     <!-- Mobile action buttons below input -->
-                    <div class="grid grid-cols-2 gap-2 sm:hidden">
+                    <div class="grid grid-cols-3 gap-2 sm:hidden">
+                        <button type="button" @click="$refs.galleryInput.click()" 
+                                class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-image"></i>
+                            <span>Galeri</span>
+                        </button>
                         <button type="button" @click="openCameraScanner()" 
-                                class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1.5">
+                                class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-camera"></i>
-                            <span>Scan Kamera</span>
+                            <span>Kamera</span>
                         </button>
                         <button type="button" @click="handleScan()" 
                                 :class="transactionType === 'incoming' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'"
-                                class="w-full py-2.5 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1.5">
+                                class="w-full py-2.5 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <span>Cari / Scan</span>
+                            <span>Cari</span>
                         </button>
                     </div>
                 </div>
@@ -429,11 +443,28 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between text-xs pt-1">
-                <span class="text-slate-400 text-[11px]"><i class="fa-solid fa-info-circle mr-1"></i> Izinkan akses kamera browser</span>
+            <div class="flex items-center justify-between gap-2 text-xs pt-1">
+                <button type="button" @click="closeCameraScanner(); $refs.galleryInput.click()" class="px-3.5 py-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400 font-extrabold rounded-xl text-xs hover:bg-amber-100 transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-image"></i>
+                    <span>Pilih dari Galeri</span>
+                </button>
                 <button type="button" @click="closeCameraScanner()" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition">
                     Batal
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Gallery Processing Overlay -->
+    <div x-cloak x-show="galleryLoading" 
+         class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-xs w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col items-center text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-circle-notch animate-spin"></i>
+            </div>
+            <div>
+                <h4 class="font-extrabold text-slate-900 dark:text-white text-sm">Memindai Gambar...</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Mencari barcode atau QR Code dari gambar galeri</p>
             </div>
         </div>
     </div>
@@ -456,6 +487,7 @@ function universalPosScanner() {
         showRegisterModal: false,
         showCameraModal: false,
         cameraLoading: false,
+        galleryLoading: false,
         html5QrScanner: null,
         isNewCategory: false,
         isNewSupplier: false,
@@ -635,6 +667,64 @@ function universalPosScanner() {
                     this.$refs.barcodeInput.focus();
                 }
             });
+        },
+
+        async handleGalleryScan(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            this.galleryLoading = true;
+
+            try {
+                let decodedText = null;
+
+                // 1. Try Native BarcodeDetector API if supported (Fastest & high accuracy for 1D/2D)
+                if ('BarcodeDetector' in window) {
+                    try {
+                        let formats = ['code_128', 'code_39', 'code_93', 'ean_13', 'ean_8', 'qr_code', 'upc_a', 'upc_e', 'itf', 'data_matrix'];
+                        if (typeof BarcodeDetector.getSupportedFormats === 'function') {
+                            const supported = await BarcodeDetector.getSupportedFormats();
+                            if (supported && supported.length > 0) {
+                                formats = supported;
+                            }
+                        }
+                        const detector = new BarcodeDetector({ formats: formats });
+                        const imageBitmap = await createImageBitmap(file);
+                        const barcodes = await detector.detect(imageBitmap);
+                        if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+                            decodedText = barcodes[0].rawValue.trim();
+                        }
+                    } catch (detectorErr) {
+                        console.warn('Native BarcodeDetector fallback:', detectorErr);
+                    }
+                }
+
+                // 2. Fallback to Html5Qrcode.scanFile
+                if (!decodedText) {
+                    const galleryScanner = new Html5Qrcode("gallery-qr-reader");
+                    try {
+                        decodedText = await galleryScanner.scanFile(file, false);
+                        await galleryScanner.clear();
+                    } catch (scanErr) {
+                        try { await galleryScanner.clear(); } catch(e) {}
+                        throw scanErr;
+                    }
+                }
+
+                if (decodedText) {
+                    this.barcodeQuery = decodedText.trim();
+                    this.galleryLoading = false;
+                    event.target.value = '';
+                    await this.handleScan();
+                } else {
+                    throw new Error('Barcode tidak terdeteksi');
+                }
+            } catch (err) {
+                console.error('Gagal scan barcode dari gambar:', err);
+                this.galleryLoading = false;
+                event.target.value = '';
+                alert('Tidak berhasil menemukan barcode atau QR Code pada gambar ini. Pastikan foto jelas, tidak buram, dan barcode terlihat penuh.');
+            }
         },
 
         async saveNewItem() {

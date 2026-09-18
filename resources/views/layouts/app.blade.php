@@ -183,22 +183,10 @@
                     <span>Barang Keluar</span>
                 </a>
 
-                <a href="{{ route('adjustments.index') }}" 
-                   class="flex items-center px-4 py-3 text-sm font-bold rounded-2xl transition-all duration-200 {{ request()->routeIs('adjustments.*') ? 'bg-[#ff8000] text-white shadow-lg shadow-[#ff8000]/30' : 'text-slate-600 dark:text-slate-300 hover:bg-orange-50 dark:hover:bg-slate-800 hover:text-[#ff8000]' }}">
-                    <i class="fa-solid fa-calculator w-6 text-center text-base mr-3 text-amber-500"></i>
-                    <span>Stock Opname</span>
-                </a>
-
                 <a href="{{ route('items.print-barcodes') }}" 
                    class="flex items-center px-4 py-3 text-sm font-bold rounded-2xl transition-all duration-200 {{ request()->routeIs('items.print-barcodes') ? 'bg-[#ff8000] text-white shadow-lg shadow-[#ff8000]/30' : 'text-slate-600 dark:text-slate-300 hover:bg-orange-50 dark:hover:bg-slate-800 hover:text-[#ff8000]' }}">
                     <i class="fa-solid fa-print w-6 text-center text-base mr-3 text-indigo-500"></i>
                     <span>Cetak Stiker Barcode</span>
-                </a>
-
-                <a href="{{ route('backup.download') }}" 
-                   class="flex items-center px-4 py-3 text-sm font-bold rounded-2xl transition-all duration-200 text-slate-600 dark:text-slate-300 hover:bg-orange-50 dark:hover:bg-slate-800 hover:text-[#ff8000]">
-                    <i class="fa-solid fa-database w-6 text-center text-base mr-3 text-sky-500"></i>
-                    <span>Backup Database (1-Klik)</span>
                 </a>
                 @endif
 
