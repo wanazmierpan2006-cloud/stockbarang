@@ -971,6 +971,7 @@ function universalPosScanner() {
                 this.galleryLoading = false;
                 event.target.value = '';
                 alert('Tidak berhasil menemukan barcode atau QR Code pada gambar ini. Pastikan foto cukup terang, barcode fokus tidak blur, dan tidak terpotong.');
+            }
         },
 
         async saveNewItem() {
