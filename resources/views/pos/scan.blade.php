@@ -133,7 +133,7 @@
                 <div class="space-y-2">
                     <!-- Hidden file input & reader for gallery scanner -->
                     <input type="file" x-ref="galleryInput" @change="handleGalleryScan($event)" accept="image/*" class="hidden">
-                    <div id="gallery-qr-reader" style="width: 1px; height: 1px; position: absolute; left: -9999px; overflow: hidden;"></div>
+                    <div id="gallery-qr-reader" style="width: 800px; height: 800px; position: fixed; left: -9999px; top: 0; opacity: 0; pointer-events: none; z-index: -1;"></div>
 
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 pl-3.5 sm:pl-4 flex items-center pointer-events-none text-slate-400">
@@ -489,6 +489,7 @@ function universalPosScanner() {
         cameraLoading: false,
         galleryLoading: false,
         html5QrScanner: null,
+        galleryScannerInstance: null,
         isNewCategory: false,
         isNewSupplier: false,
         newItem: {
@@ -669,6 +670,64 @@ function universalPosScanner() {
             });
         },
 
+        loadImageFromFile(file) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+                img.onload = () => {
+                    URL.revokeObjectURL(url);
+                    resolve(img);
+                };
+                img.onerror = (e) => {
+                    URL.revokeObjectURL(url);
+                    reject(e);
+                };
+                img.src = url;
+            });
+        },
+
+        processImageToBlob(img, degree = 0, maxDim = 1200) {
+            return new Promise((resolve) => {
+                let width = img.naturalWidth || img.width;
+                let height = img.naturalHeight || img.height;
+
+                if (Math.max(width, height) > maxDim) {
+                    const scale = maxDim / Math.max(width, height);
+                    width = Math.round(width * scale);
+                    height = Math.round(height * scale);
+                }
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                if (degree === 90 || degree === 270) {
+                    canvas.width = height;
+                    canvas.height = width;
+                } else {
+                    canvas.width = width;
+                    canvas.height = height;
+                }
+
+                ctx.save();
+                if (degree === 90) {
+                    ctx.translate(height, 0);
+                    ctx.rotate(Math.PI / 2);
+                } else if (degree === 180) {
+                    ctx.translate(width, height);
+                    ctx.rotate(Math.PI);
+                } else if (degree === 270) {
+                    ctx.translate(0, width);
+                    ctx.rotate((3 * Math.PI) / 2);
+                }
+                ctx.drawImage(img, 0, 0, width, height);
+                ctx.restore();
+
+                canvas.toBlob((blob) => {
+                    resolve(new File([blob], `scan_${degree}.jpg`, { type: 'image/jpeg' }));
+                }, 'image/jpeg', 0.92);
+            });
+        },
+
         async handleGalleryScan(event) {
             const file = event.target.files && event.target.files[0];
             if (!file) return;
@@ -678,7 +737,7 @@ function universalPosScanner() {
             try {
                 let decodedText = null;
 
-                // 1. Try Native BarcodeDetector API if supported (Fastest & high accuracy for 1D/2D)
+                // 1. Coba Native BarcodeDetector API jika didukung browser
                 if ('BarcodeDetector' in window) {
                     try {
                         let formats = ['code_128', 'code_39', 'code_93', 'ean_13', 'ean_8', 'qr_code', 'upc_a', 'upc_e', 'itf', 'data_matrix'];
@@ -699,15 +758,67 @@ function universalPosScanner() {
                     }
                 }
 
-                // 2. Fallback to Html5Qrcode.scanFile
+                // 2. Fallback menggunakan Html5Qrcode dengan Multi-Pass (Original -> Normalisasi Ukuran -> Rotasi 90° -> Rotasi 270°)
                 if (!decodedText) {
-                    const galleryScanner = new Html5Qrcode("gallery-qr-reader");
+                    const containerEl = document.getElementById("gallery-qr-reader");
+                    if (containerEl) {
+                        containerEl.style.width = "800px";
+                        containerEl.style.height = "800px";
+                    }
+
+                    if (!this.galleryScannerInstance) {
+                        const config = {
+                            experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+                        };
+                        if (window.Html5QrcodeSupportedFormats) {
+                            config.formatsToSupport = [
+                                Html5QrcodeSupportedFormats.QR_CODE,
+                                Html5QrcodeSupportedFormats.UPC_A,
+                                Html5QrcodeSupportedFormats.UPC_E,
+                                Html5QrcodeSupportedFormats.UPC_EAN_EXTENSION,
+                                Html5QrcodeSupportedFormats.EAN_13,
+                                Html5QrcodeSupportedFormats.EAN_8,
+                                Html5QrcodeSupportedFormats.CODE_39,
+                                Html5QrcodeSupportedFormats.CODE_93,
+                                Html5QrcodeSupportedFormats.CODE_128,
+                                Html5QrcodeSupportedFormats.CODABAR,
+                                Html5QrcodeSupportedFormats.ITF,
+                                Html5QrcodeSupportedFormats.DATA_MATRIX
+                            ];
+                        }
+                        this.galleryScannerInstance = new Html5Qrcode("gallery-qr-reader", config);
+                    }
+
+                    // Pass A: Coba scan file asli terlebih dahulu
                     try {
-                        decodedText = await galleryScanner.scanFile(file, false);
-                        await galleryScanner.clear();
-                    } catch (scanErr) {
-                        try { await galleryScanner.clear(); } catch(e) {}
-                        throw scanErr;
+                        decodedText = await this.galleryScannerInstance.scanFile(file, false);
+                    } catch (e1) {
+                        // Pass A gagal: Coba muat gambar untuk pemrosesan normalisasi ukuran dan rotasi
+                        try {
+                            const img = await this.loadImageFromFile(file);
+
+                            // Pass B: Normalisasi resolusi optimal (max 1200px) agar barcode tidak terdistorsi
+                            const normFile = await this.processImageToBlob(img, 0, 1200);
+                            try {
+                                decodedText = await this.galleryScannerInstance.scanFile(normFile, false);
+                            } catch (e2) {
+                                // Pass C: Putar 90 derajat (barcode vertikal dari foto smartphone portrait)
+                                const rot90File = await this.processImageToBlob(img, 90, 1200);
+                                try {
+                                    decodedText = await this.galleryScannerInstance.scanFile(rot90File, false);
+                                } catch (e3) {
+                                    // Pass D: Putar 270 derajat
+                                    const rot270File = await this.processImageToBlob(img, 270, 1200);
+                                    try {
+                                        decodedText = await this.galleryScannerInstance.scanFile(rot270File, false);
+                                    } catch (e4) {
+                                        console.warn('Semua sudut scan telah dicoba:', e4);
+                                    }
+                                }
+                            }
+                        } catch (imgErr) {
+                            console.warn('Gagal memproses canvas gambar:', imgErr);
+                        }
                     }
                 }
 
