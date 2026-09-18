@@ -131,34 +131,25 @@
                 </div>
 
                 <div class="space-y-2">
-                    <!-- Hidden file input & reader for gallery scanner -->
-                    <input type="file" x-ref="galleryInput" @change="handleGalleryScan($event)" accept="image/*" class="hidden">
-                    <div id="gallery-qr-reader" style="width: 800px; height: 800px; position: fixed; left: -9999px; top: 0; opacity: 0; pointer-events: none; z-index: -1;"></div>
-
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 pl-3.5 sm:pl-4 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-solid fa-barcode text-lg sm:text-xl"></i>
                         </div>
                         <input type="text" x-ref="barcodeInput" x-model="barcodeQuery" @keydown.enter.prevent="handleScan()" 
                                placeholder="Arahkan barcode scanner / ketik kode..." 
-                               class="w-full pl-10 sm:pl-12 pr-4 sm:pr-72 py-3 sm:py-3.5 bg-slate-50 dark:bg-slate-800 border-2 rounded-2xl text-sm sm:text-base font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 transition-all"
+                               class="w-full pl-10 sm:pl-12 pr-4 sm:pr-48 py-3 sm:py-3.5 bg-slate-50 dark:bg-slate-800 border-2 rounded-2xl text-sm sm:text-base font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 transition-all"
                                :class="transactionType === 'incoming' ? 'border-emerald-500/40 focus:border-emerald-500 focus:ring-emerald-500/10' : 'border-rose-500/40 focus:border-rose-500 focus:ring-rose-500/10'">
                         
                         <!-- Desktop action buttons inside input -->
                         <div class="hidden sm:flex absolute right-2 top-2 bottom-2 items-center space-x-1.5">
-                            <button type="button" @click="$refs.galleryInput.click()" 
-                                    class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
-                                <i class="fa-solid fa-image"></i>
-                                <span>Galeri</span>
-                            </button>
                             <button type="button" @click="openCameraScanner()" 
-                                    class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
+                                    class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
                                 <i class="fa-solid fa-camera"></i>
                                 <span>Kamera</span>
                             </button>
                             <button type="button" @click="handleScan()" 
                                     :class="transactionType === 'incoming' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'"
-                                    class="px-3.5 py-2 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
+                                    class="px-4 py-2 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center space-x-1">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                                 <span>Scan</span>
                             </button>
@@ -166,22 +157,17 @@
                     </div>
 
                     <!-- Mobile action buttons below input -->
-                    <div class="grid grid-cols-3 gap-2 sm:hidden">
-                        <button type="button" @click="$refs.galleryInput.click()" 
-                                class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-image"></i>
-                            <span>Galeri</span>
-                        </button>
+                    <div class="grid grid-cols-2 gap-2 sm:hidden">
                         <button type="button" @click="openCameraScanner()" 
-                                class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1">
+                                class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1.5">
                             <i class="fa-solid fa-camera"></i>
-                            <span>Kamera</span>
+                            <span>Scan Kamera</span>
                         </button>
                         <button type="button" @click="handleScan()" 
                                 :class="transactionType === 'incoming' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'"
-                                class="w-full py-2.5 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1">
+                                class="w-full py-2.5 text-white text-xs font-extrabold rounded-xl shadow transition flex items-center justify-center space-x-1.5">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <span>Cari</span>
+                            <span>Cari / Scan</span>
                         </button>
                     </div>
                 </div>
@@ -443,11 +429,8 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between gap-2 text-xs pt-1">
-                <button type="button" @click="closeCameraScanner(); $refs.galleryInput.click()" class="px-3.5 py-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-400 font-extrabold rounded-xl text-xs hover:bg-amber-100 transition flex items-center space-x-1.5">
-                    <i class="fa-solid fa-image"></i>
-                    <span>Pilih dari Galeri</span>
-                </button>
+            <div class="flex items-center justify-between text-xs pt-1">
+                <span class="text-slate-400 text-[11px]"><i class="fa-solid fa-info-circle mr-1"></i> Izinkan akses kamera browser</span>
                 <button type="button" @click="closeCameraScanner()" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition">
                     Batal
                 </button>
@@ -455,35 +438,10 @@
         </div>
     </div>
 
-    <!-- Modal: Gallery Processing Overlay -->
-    <div x-cloak x-show="galleryLoading" 
-         class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-xs w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col items-center text-center space-y-3">
-            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xl">
-                <i class="fa-solid fa-circle-notch animate-spin"></i>
-            </div>
-            <div>
-                <h4 class="font-extrabold text-slate-900 dark:text-white text-sm">Memindai Gambar...</h4>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Mencari barcode atau QR Code dari gambar galeri</p>
-            </div>
-        </div>
-    </div>
-
 </div>
 
 @push('scripts')
-<script type="module">
-    import { BarcodeDetectorPolyfill } from "https://cdn.jsdelivr.net/npm/@undecaf/barcode-detector-polyfill@0.9.21/+esm";
-    try {
-        if (!('BarcodeDetector' in window)) {
-            window.BarcodeDetector = BarcodeDetectorPolyfill;
-        }
-    } catch (e) {
-        window.BarcodeDetector = BarcodeDetectorPolyfill;
-    }
-</script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
 <script>
 function universalPosScanner() {
     return {
@@ -498,9 +456,7 @@ function universalPosScanner() {
         showRegisterModal: false,
         showCameraModal: false,
         cameraLoading: false,
-        galleryLoading: false,
         html5QrScanner: null,
-        galleryScannerInstance: null,
         isNewCategory: false,
         isNewSupplier: false,
         newItem: {
@@ -679,299 +635,6 @@ function universalPosScanner() {
                     this.$refs.barcodeInput.focus();
                 }
             });
-        },
-
-        loadImageFromFile(file) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                const url = URL.createObjectURL(file);
-                img.onload = () => {
-                    URL.revokeObjectURL(url);
-                    resolve(img);
-                };
-                img.onerror = (e) => {
-                    URL.revokeObjectURL(url);
-                    reject(e);
-                };
-                img.src = url;
-            });
-        },
-
-        getCanvas(img, degree = 0, maxDim = 1200, boostContrast = false) {
-            let width = img.naturalWidth || img.width;
-            let height = img.naturalHeight || img.height;
-
-            if (Math.max(width, height) > maxDim) {
-                const scale = maxDim / Math.max(width, height);
-                width = Math.round(width * scale);
-                height = Math.round(height * scale);
-            }
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            if (degree === 90 || degree === 270) {
-                canvas.width = height;
-                canvas.height = width;
-            } else {
-                canvas.width = width;
-                canvas.height = height;
-            }
-
-            ctx.save();
-            if (degree === 90) {
-                ctx.translate(height, 0);
-                ctx.rotate(Math.PI / 2);
-            } else if (degree === 180) {
-                ctx.translate(width, height);
-                ctx.rotate(Math.PI);
-            } else if (degree === 270) {
-                ctx.translate(0, width);
-                ctx.rotate((3 * Math.PI) / 2);
-            }
-            ctx.drawImage(img, 0, 0, width, height);
-            ctx.restore();
-
-            if (boostContrast) {
-                try {
-                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const d = imgData.data;
-                    const factor = (259 * (60 + 255)) / (255 * (259 - 60));
-                    for (let i = 0; i < d.length; i += 4) {
-                        const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-                        const c = Math.min(255, Math.max(0, factor * (gray - 128) + 128));
-                        d[i] = c;
-                        d[i + 1] = c;
-                        d[i + 2] = c;
-                    }
-                    ctx.putImageData(imgData, 0, 0);
-                } catch (e) {}
-            }
-
-            return canvas;
-        },
-
-        getCenterCropCanvas(img, maxDim = 1200) {
-            const srcW = img.naturalWidth || img.width;
-            const srcH = img.naturalHeight || img.height;
-
-            const cropW = Math.round(srcW * 0.72);
-            const cropH = Math.round(srcH * 0.72);
-            const startX = Math.round((srcW - cropW) / 2);
-            const startY = Math.round((srcH - cropH) / 2);
-
-            let destW = cropW;
-            let destH = cropH;
-            if (Math.max(destW, destH) > maxDim) {
-                const scale = maxDim / Math.max(destW, destH);
-                destW = Math.round(destW * scale);
-                destH = Math.round(destH * scale);
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = destW;
-            canvas.height = destH;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, startX, startY, cropW, cropH, 0, 0, destW, destH);
-            return canvas;
-        },
-
-        canvasToFile(canvas, name = 'scan.jpg') {
-            return new Promise((resolve) => {
-                canvas.toBlob((blob) => {
-                    resolve(new File([blob], name, { type: 'image/jpeg' }));
-                }, 'image/jpeg', 0.95);
-            });
-        },
-
-        decodeWithQuagga(src, patchSize = "medium", halfSample = true) {
-            return new Promise((resolve) => {
-                if (typeof Quagga === 'undefined') return resolve(null);
-                try {
-                    // Gunakan HANYA format dengan verifikasi Checksum ketat untuk mencegah data ngawur / salah baca
-                    Quagga.decodeSingle({
-                        src: src,
-                        numOfWorkers: 0,
-                        locate: true,
-                        inputStream: {
-                            size: 1200
-                        },
-                        decoder: {
-                            readers: [
-                                "code_128_reader",
-                                "ean_reader",
-                                "ean_8_reader",
-                                "upc_reader",
-                                "upc_e_reader"
-                            ],
-                            multiple: false
-                        },
-                        locator: {
-                            patchSize: patchSize,
-                            halfSample: halfSample
-                        }
-                    }, (result) => {
-                        if (result && result.codeResult && result.codeResult.code) {
-                            resolve(result.codeResult.code.trim());
-                        } else {
-                            resolve(null);
-                        }
-                    });
-                } catch (e) {
-                    console.warn('Quagga error:', e);
-                    resolve(null);
-                }
-            });
-        },
-
-        async detectWithBarcodeDetector(source) {
-            if (!('BarcodeDetector' in window)) return null;
-            try {
-                let formats = ['code_128', 'ean_13', 'ean_8', 'qr_code', 'upc_a', 'upc_e', 'code_39'];
-                if (typeof BarcodeDetector.getSupportedFormats === 'function') {
-                    try {
-                        const supported = await BarcodeDetector.getSupportedFormats();
-                        if (supported && supported.length > 0) {
-                            const filtered = formats.filter(f => supported.includes(f));
-                            if (filtered.length > 0) formats = filtered;
-                        }
-                    } catch (e) {}
-                }
-
-                const detector = new BarcodeDetector({ formats: formats });
-                let input = source;
-                if (source instanceof File || source instanceof Blob) {
-                    if (typeof createImageBitmap === 'function') {
-                        try {
-                            input = await createImageBitmap(source);
-                        } catch (e) {
-                            input = source;
-                        }
-                    }
-                }
-
-                const barcodes = await detector.detect(input);
-                if (barcodes && barcodes.length > 0) {
-                    for (const b of barcodes) {
-                        if (b.rawValue && b.rawValue.trim()) {
-                            return b.rawValue.trim();
-                        }
-                    }
-                }
-            } catch (e) {
-                console.warn('BarcodeDetector error:', e);
-            }
-            return null;
-        },
-
-        async handleGalleryScan(event) {
-            const file = event.target.files && event.target.files[0];
-            if (!file) return;
-
-            this.galleryLoading = true;
-
-            try {
-                let decodedText = null;
-
-                // Tahap 1: Coba BarcodeDetector (ZBar WASM Polyfill / Browser Native) langsung pada file
-                decodedText = await this.detectWithBarcodeDetector(file);
-
-                // Jika belum ditemukan, muat elemen gambar untuk variasi Canvas
-                let img = null;
-                let canvasCrop = null;
-                let canvasRot90 = null;
-                let canvasContrast = null;
-
-                try {
-                    img = await this.loadImageFromFile(file);
-                    canvasCrop = this.getCenterCropCanvas(img, 1200);
-                    canvasRot90 = this.getCanvas(img, 90, 1200, false);
-                    canvasContrast = this.getCanvas(img, 0, 1200, true);
-                } catch (imgErr) {
-                    console.warn('Gagal memuat gambar ke kanvas:', imgErr);
-                }
-
-                // Tahap 2: Coba BarcodeDetector pada Canvas Center-Crop, Rotasi 90°, dan Kontras Tinggi
-                if (!decodedText && img) {
-                    decodedText = (await this.detectWithBarcodeDetector(canvasCrop)) ||
-                                  (await this.detectWithBarcodeDetector(canvasRot90)) ||
-                                  (await this.detectWithBarcodeDetector(canvasContrast));
-                }
-
-                // Tahap 3: Coba Quagga2 dengan format validasi checksum (Code 128, EAN, UPC)
-                if (!decodedText) {
-                    if (canvasCrop) {
-                        decodedText = await this.decodeWithQuagga(canvasCrop.toDataURL('image/jpeg', 0.95), "medium", true);
-                    }
-                    if (!decodedText) {
-                        const fileObjUrl = URL.createObjectURL(file);
-                        try {
-                            decodedText = await this.decodeWithQuagga(fileObjUrl, "medium", true);
-                            if (!decodedText) {
-                                decodedText = await this.decodeWithQuagga(fileObjUrl, "large", false);
-                            }
-                        } finally {
-                            URL.revokeObjectURL(fileObjUrl);
-                        }
-                    }
-                    if (!decodedText && canvasRot90) {
-                        decodedText = await this.decodeWithQuagga(canvasRot90.toDataURL('image/jpeg', 0.95), "medium", true);
-                    }
-                    if (!decodedText && canvasContrast) {
-                        decodedText = await this.decodeWithQuagga(canvasContrast.toDataURL('image/jpeg', 0.95), "medium", true);
-                    }
-                }
-
-                // Tahap 4: Fallback ke Html5Qrcode (ZXing untuk QR Code & DataMatrix)
-                if (!decodedText) {
-                    const containerEl = document.getElementById("gallery-qr-reader");
-                    if (containerEl) {
-                        containerEl.style.width = "800px";
-                        containerEl.style.height = "800px";
-                    }
-
-                    if (!this.galleryScannerInstance) {
-                        const config = {
-                            experimentalFeatures: { useBarCodeDetectorIfSupported: true }
-                        };
-                        this.galleryScannerInstance = new Html5Qrcode("gallery-qr-reader", config);
-                    }
-
-                    try {
-                        decodedText = await this.galleryScannerInstance.scanFile(file, false);
-                    } catch (e1) {
-                        if (canvasCrop) {
-                            try {
-                                const cropFile = await this.canvasToFile(canvasCrop, 'crop.jpg');
-                                decodedText = await this.galleryScannerInstance.scanFile(cropFile, false);
-                            } catch (e2) {
-                                if (canvasRot90) {
-                                    try {
-                                        const rotFile = await this.canvasToFile(canvasRot90, 'rot.jpg');
-                                        decodedText = await this.galleryScannerInstance.scanFile(rotFile, false);
-                                    } catch (e3) {
-                                        console.warn('Semua filter scanner selesai:', e3);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (decodedText) {
-                    this.barcodeQuery = decodedText.trim();
-                    this.galleryLoading = false;
-                    event.target.value = '';
-                    await this.handleScan();
-                } else {
-                    throw new Error('Barcode tidak terdeteksi');
-                }
-            } catch (err) {
-                console.error('Gagal scan barcode dari gambar:', err);
-                this.galleryLoading = false;
-                event.target.value = '';
-                alert('Tidak berhasil menemukan barcode atau QR Code pada gambar ini. Pastikan foto cukup terang, barcode fokus tidak blur, dan tidak terpotong.');
-            }
         },
 
         async saveNewItem() {
