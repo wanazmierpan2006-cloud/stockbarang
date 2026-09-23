@@ -1,5 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
+cd /d "%~dp0"
 chcp 65001 >nul
 title Setup Projek Laravel Local
 
@@ -100,16 +101,6 @@ if not exist ".env" (
     echo [OK] File .env sudah ada.
 )
 
-:: Cek & Siapkan Database MySQL di Laragon jika script ada
-if exist "database\prepare_mysql.php" (
-    call php database/prepare_mysql.php
-)
-
-:: Pastikan fallback SQLite tersedia
-if not exist "database\database.sqlite" (
-    type nul > "database\database.sqlite"
-)
-
 :: Menyiapkan Direktori Storage & Cache serta izin akses tulis
 if not exist "bootstrap\cache" mkdir "bootstrap\cache"
 if not exist "storage\framework\cache" mkdir "storage\framework\cache"
@@ -142,13 +133,22 @@ echo.
 :: 4. GENERATE KEY & MIGRASI DATABASE
 :: ---------------------------------------------------------
 echo [4/6] Menyiapkan Application Key, Storage Link, dan Database...
+call php artisan config:clear
+call php database/prepare_mysql.php
+if errorlevel 1 (
+    echo [X] Gagal menyiapkan MySQL. Periksa service dan konfigurasi .env.
+    pause
+    exit /b 1
+)
 call php artisan key:generate
 call php artisan storage:link 2>nul
 
 echo [+] Menjalankan migrasi tabel dan seeding data awal ke Database...
 call php artisan migrate --seed --force
 if %ERRORLEVEL% NEQ 0 (
-    echo [!] Warning: Migrasi database gagal atau tertunda. Pastikan MySQL di Laragon sudah aktif.
+    echo [X] Migrasi MySQL gagal.
+    pause
+    exit /b 1
 ) else (
     echo [OK] Migrasi dan seeding database berhasil.
 )
