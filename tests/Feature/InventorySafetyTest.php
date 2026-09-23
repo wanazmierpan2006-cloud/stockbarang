@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\Item;
 use App\Models\Supplier;
 use App\Models\User;
+use App\Services\InventoryService;
+use App\Services\ItemService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -61,6 +63,74 @@ class InventorySafetyTest extends TestCase
             'stok' => 10,
             'minimum_stok' => 5,
         ]);
+    }
+
+    public function test_deleting_item_preserves_transaction_and_adjustment_history()
+    {
+        $inventory = app(InventoryService::class);
+        $incoming = $inventory->processIncomingTransaction([
+            'supplier_id' => $this->supplier->id,
+            'tanggal' => now()->toDateString(),
+        ], [['item_id' => $this->item->id, 'jumlah' => 5]], $this->admin->id);
+        $outgoing = $inventory->processOutgoingTransaction([
+            'tujuan' => 'Gudang Cabang',
+            'tanggal' => now()->toDateString(),
+        ], [['item_id' => $this->item->id, 'jumlah' => 2]], $this->admin->id);
+        $adjustment = $inventory->processStockAdjustment([
+            'item_id' => $this->item->id,
+            'stok_sesudah' => 12,
+            'alasan' => 'Koreksi stok fisik',
+        ], $this->admin->id);
+
+        $this->actingAs($this->admin)->delete("/items/{$this->item->id}")
+            ->assertRedirect('/items')->assertSessionHas('success');
+
+        $this->assertSoftDeleted($this->item);
+        $this->assertNull(Item::find($this->item->id));
+        $this->assertFalse(app(ItemService::class)->getAllItems()->contains('id', $this->item->id));
+        $this->assertModelExists($incoming);
+        $this->assertModelExists($outgoing);
+        $this->assertModelExists($adjustment);
+        $this->assertEquals(5, $incoming->fresh()->details->sole()->jumlah);
+        $this->assertEquals(2, $outgoing->fresh()->details->sole()->jumlah);
+        $this->assertSame($this->item->nama_barang, $incoming->fresh()->details->sole()->item->nama_barang);
+        $this->assertSame($this->item->nama_barang, $outgoing->fresh()->details->sole()->item->nama_barang);
+        $this->assertSame($this->item->nama_barang, $adjustment->fresh()->item->nama_barang);
+
+        $this->withoutVite();
+        $this->get('/items')->assertOk()->assertDontSee($this->item->nama_barang);
+        $this->get('/incoming')->assertOk()->assertSee($this->item->nama_barang);
+        $this->get('/outgoing')->assertOk()->assertSee($this->item->nama_barang);
+    }
+
+    public function test_deleted_item_cannot_be_scanned_or_used_in_new_transactions()
+    {
+        $this->actingAs($this->admin)->delete("/items/{$this->item->id}")
+            ->assertSessionHas('success');
+
+        foreach ([$this->item->barcode, $this->item->kode_barang] as $code) {
+            $this->getJson('/api/items/scan?barcode='.$code)->assertNotFound();
+        }
+
+        foreach (['incoming', 'outgoing'] as $type) {
+            $this->from("/{$type}/create")->post("/{$type}", [
+                'tanggal' => now()->toDateString(),
+                'supplier_id' => $this->supplier->id,
+                'tujuan' => 'Gudang Cabang',
+                'items' => json_encode([['item_id' => $this->item->id, 'jumlah' => 1]]),
+            ])->assertSessionHas('error');
+            $this->assertDatabaseCount($type.'_transactions', 0);
+        }
+
+        $this->assertEquals(10, Item::withTrashed()->findOrFail($this->item->id)->stok);
+    }
+
+    public function test_gudang_cannot_delete_an_item()
+    {
+        $this->actingAs($this->gudang)->delete("/items/{$this->item->id}")
+            ->assertRedirect('/dashboard');
+
+        $this->assertNotSoftDeleted($this->item);
     }
 
     public function test_category_in_use_cannot_be_deleted()

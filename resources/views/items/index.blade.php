@@ -107,7 +107,7 @@
                                 <form id="delete-item-{{ $item->id }}" action="{{ route('items.destroy', $item->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" onclick="confirmDelete('delete-item-{{ $item->id }}', 'Apakah Anda yakin ingin menghapus barang {{ $item->nama_barang }}?')" 
+                                    <button type="button" onclick="confirmDelete('delete-item-{{ $item->id }}', {{ Illuminate\Support\Js::from('Hapus barang '.$item->nama_barang.' dari daftar aktif? Riwayat transaksi dan stock opname tetap tersimpan. Barang tidak dapat dipilih untuk transaksi baru.') }})"
                                             class="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition" title="Hapus Barang">
                                         <i class="fa-solid fa-trash text-base"></i>
                                     </button>

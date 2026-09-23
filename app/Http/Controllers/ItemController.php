@@ -72,14 +72,16 @@ class ItemController extends Controller
     public function destroy($id)
     {
         try {
-            $this->itemService->deleteItem($id);
+            if (! $this->itemService->deleteItem($id)) {
+                return redirect()->route('items.index')->with('error', 'Barang tidak ditemukan.');
+            }
         } catch (QueryException $e) {
             report($e);
 
-            return redirect()->route('items.index')->with('error', 'Barang tidak dapat dihapus karena masih memiliki riwayat transaksi. Gunakan fitur nonaktifkan jika tersedia.');
+            return redirect()->route('items.index')->with('error', 'Barang gagal dihapus. Silakan coba lagi.');
         }
 
-        return redirect()->route('items.index')->with('success', 'Barang berhasil dihapus.');
+        return redirect()->route('items.index')->with('success', 'Barang berhasil dihapus dari daftar aktif. Riwayat transaksi tetap tersimpan.');
     }
 
     public function printBarcodes(Request $request)

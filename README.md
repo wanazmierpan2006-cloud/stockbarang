@@ -4,7 +4,7 @@
 [![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
 [![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
-[![SQLite/MySQL](https://img.shields.io/badge/Database-SQLite%2FMySQL-003545?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)
+[![MySQL](https://img.shields.io/badge/Database-MySQL-003545?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com)
 
 Sistem Informasi Manajemen Inventarisasi Barang dan Kasir Point of Sale (POS) berbasis web berbasis framework **Laravel 12**. Sistem ini dilengkapi dengan integrasi pemindai barcode (*barcode scanner*), pelacakan stok otomatis, manajemen transaksi barang masuk & keluar, penyesuaian stok opname, serta ekspor laporan berbasis PDF/Excel.
 
@@ -44,7 +44,7 @@ Sistem Informasi Manajemen Inventarisasi Barang dan Kasir Point of Sale (POS) be
 
 - **Backend Framework**: Laravel 12.x (PHP 8.3+)
 - **Frontend & Styling**: Blade, Vite 8.x, Tailwind CSS 4.x
-- **Database**: SQLite (Default lokal) / MySQL
+- **Database**: MySQL (`stockbarang`)
 - **Concurrency & Scripting**: Node.js, `concurrently` (menjalankan Artisan Serve, Queue, dan Vite bersamaan)
 - **Automated Windows Runners**: File `setup.bat` dan `start.bat` untuk eksekusi sekali klik.
 
@@ -57,8 +57,8 @@ Sistem Informasi Manajemen Inventarisasi Barang dan Kasir Point of Sale (POS) be
 1. **Setup Otomatis (Pertama Kali)**:
    Jalankan file `setup.bat` dengan melakukan **double-click**. File ini akan secara otomatis:
    - Memeriksa PHP, Composer, dan Node.js di Laragon / XAMPP / System PATH.
-   - Mengaktifkan ekstensi `pdo_sqlite` jika diperlukan.
-   - Membuat file `.env` dan `database.sqlite`.
+   - Memerlukan MySQL aktif dan ekstensi PHP `pdo_mysql`.
+   - Membuat file `.env` dan database MySQL `stockbarang`.
    - Menginstall dependensi Composer & NPM.
    - Meng-generate App Key, Storage Link, serta migrasi database.
    - Mengompilasi assets Vite (`npm run build`).
@@ -81,9 +81,9 @@ npm install
 # 3. Setup Environment & Database
 copy .env.example .env
 php artisan key:generate
-type nul > database\database.sqlite   # Untuk Windows Command Prompt
+php database/prepare_mysql.php
 php artisan storage:link
-php artisan migrate --force
+php artisan migrate --seed --force
 
 # 4. Compile Frontend Assets & Menjalankan Server
 composer run dev
@@ -454,3 +454,9 @@ web wann/
 ## 📄 Lisensi
 
 Projek ini berlisensi [MIT License](LICENSE).
+
+## Database MySQL
+
+Aplikasi, session, cache, dan antrean menggunakan MySQL. Atur koneksi di `.env`: `DB_CONNECTION=mysql`, `DB_HOST=127.0.0.1`, `DB_PORT=3306`, `DB_DATABASE=stockbarang`, serta username/password MySQL Anda. Jalankan `php artisan config:clear` setelah mengubah konfigurasi.
+
+Untuk pengujian, jalankan `php database/prepare_mysql.php --testing` lalu `php artisan test`. PHPUnit menggunakan database MySQL terpisah `stockbarang_testing` karena tes mereset tabel. Skrip persiapan hanya membuat database jika belum ada; tidak menghapus data pada instalasi berikutnya.
