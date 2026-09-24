@@ -243,7 +243,7 @@
     <!-- Signature -->
     <div class="footer-sig">
         <div class="sig-box">
-            <p>Jakarta, {{ date('d F Y') }}</p>
+            <p>Medan, {{ date('d F Y') }}</p>
             <p class="font-bold">Mengetahui & Menyetujui,</p>
             <div class="sig-space"></div>
             <p class="font-bold" style="text-decoration: underline;">( ............................................ )</p>
